@@ -7,13 +7,12 @@
 //
 
 import SpriteKit
+import AVFoundation
 
-class GameScene: SKScene {
+class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here */
+        setupPhysicsWorld()
         setBackground()
-        createEnemys()
-        
     }
     
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
@@ -22,17 +21,7 @@ class GameScene: SKScene {
         for touch in (touches as! Set<UITouch>) {
             let location = touch.locationInNode(self)
             
-            let sprite = SKSpriteNode(imageNamed:"Spaceship")
-            
-            sprite.xScale = 0.5
-            sprite.yScale = 0.5
-            sprite.position = location
-            
-            let action = SKAction.rotateByAngle(CGFloat(M_PI), duration:1)
-            
-            sprite.runAction(SKAction.repeatActionForever(action))
-            
-            self.addChild(sprite)
+            let charmander = SKSpriteNode(imageNamed: "Charmander")
         }
     }
    
@@ -42,9 +31,16 @@ class GameScene: SKScene {
     
     func setBackground() {
         let background = SKSpriteNode(imageNamed: "Background")
+        background.anchorPoint = CGPointMake(0.0, 1.0)
         background.size = self.frame.size
-        background.position = CGPointMake(CGRectGetMidX(self.frame), CGRectGetMidY(self.frame))
+        background.position = CGPointMake(self.frame.minX + self.frame.size.width/4, self.frame.maxY)
         background.xScale = 0.5
         self.addChild(background)
     }
+    
+    func setupPhysicsWorld() {
+        physicsWorld.gravity = CGVectorMake(0, 0)
+        physicsWorld.contactDelegate = self
+    }
+    
 }

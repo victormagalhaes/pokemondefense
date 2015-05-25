@@ -10,9 +10,13 @@ import SpriteKit
 import AVFoundation
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
+    var tower : SKSpriteNode!
+    var currentTexture = 0
+    
     override func didMoveToView(view: SKView) {
         setupPhysicsWorld()
         setBackground()
+        createCharmander()
     }
     
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
@@ -21,7 +25,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         for touch in (touches as! Set<UITouch>) {
             let location = touch.locationInNode(self)
             
-            let charmander = SKSpriteNode(imageNamed: "Charmander")
         }
     }
    
@@ -33,8 +36,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let background = SKSpriteNode(imageNamed: "Background")
         background.anchorPoint = CGPointMake(0.0, 1.0)
         background.size = self.frame.size
-        background.position = CGPointMake(self.frame.minX + self.frame.size.width/4, self.frame.maxY)
-        background.xScale = 0.5
+        background.position = CGPointMake(self.frame.minX, self.frame.maxY)
+        background.zPosition = -1
         self.addChild(background)
     }
     
@@ -43,4 +46,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.contactDelegate = self
     }
     
+    func createCharmander() {
+        var texture = SKTexture(imageNamed: "charmander-001")
+        tower = SKSpriteNode(texture: texture)
+        tower.position = CGPointMake(frame.midX, frame.midY)
+        tower.anchorPoint = CGPointMake(0.5, 0.5)
+        self.addChild(tower)
+    }
 }

@@ -96,7 +96,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         charmander.physicsBody?.allowsRotation = false
         charmander.physicsBody?.dynamic = true
         charmander.physicsBody?.restitution = 0
-        charmander.physicsBody?.linearDamping = 0
+        charmander.physicsBody?.angularDamping = 1
         charmander.physicsBody?.categoryBitMask = PhysicsCategory.Charmander
         charmander.physicsBody?.contactTestBitMask = PhysicsCategory.Background | PhysicsCategory.Koffing
         charmander.physicsBody?.collisionBitMask = PhysicsCategory.Background

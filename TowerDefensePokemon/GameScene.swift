@@ -17,12 +17,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         static let None: UInt32 = 0
         static let Charmander: UInt32 = 0b001
         static let Background: UInt32 = 0b010
+        static let Koffing: UInt32 = 0b011
     }
     
     override func didMoveToView(view: SKView) {
         createPhysicsWorld()
         createEnvironment()
         createCharmander(CGPointMake(self.frame.midX, self.frame.midY))
+        createKoffing(CGPointMake(self.frame.minX + 200, self.frame.maxY - 100))
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
@@ -96,7 +98,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         charmander.physicsBody?.restitution = 0
         charmander.physicsBody?.linearDamping = 0
         charmander.physicsBody?.categoryBitMask = PhysicsCategory.Charmander
-        charmander.physicsBody?.contactTestBitMask = PhysicsCategory.Background
+        charmander.physicsBody?.contactTestBitMask = PhysicsCategory.Background | PhysicsCategory.Koffing
         charmander.physicsBody?.collisionBitMask = PhysicsCategory.Background
         
         self.addChild(charmander)
@@ -104,6 +106,29 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let animationTexture = SKAction.animateWithTextures(createTexturesForCharmander(), timePerFrame: 0.3)
         var charmanderAnimation = SKAction.repeatActionForever(animationTexture)
         charmander.runAction(charmanderAnimation)
+    }
+    
+    func createKoffing(positionToCreate: CGPoint) {
+        var texture = SKTexture(imageNamed: "koffing-1")
+        koffing = SKSpriteNode(texture: texture)
+        koffing.xScale = 0.75
+        koffing.yScale = 0.75
+        koffing.position = positionToCreate
+        koffing.anchorPoint = CGPointMake(0.5, 0.5)
+        koffing.physicsBody = SKPhysicsBody(circleOfRadius: 18.0)
+        koffing.physicsBody?.allowsRotation = false
+        koffing.physicsBody?.dynamic = true
+        koffing.physicsBody?.restitution = 0
+        koffing.physicsBody?.linearDamping = 0
+        koffing.physicsBody?.categoryBitMask = PhysicsCategory.Koffing
+        koffing.physicsBody?.contactTestBitMask = PhysicsCategory.Background | PhysicsCategory.Charmander
+        koffing.physicsBody?.collisionBitMask = PhysicsCategory.Background
+        
+        self.addChild(koffing)
+        
+        let animationTexture = SKAction.animateWithTextures(createTexturesForKoffing(), timePerFrame: 0.3)
+        var koffingAnimation = SKAction.repeatActionForever(animationTexture)
+        koffing.runAction(koffingAnimation)
     }
     
     func convertToRadians(angle: CGFloat) -> CGFloat {
@@ -139,7 +164,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func createTexturesForKoffing() -> [SKTexture] {
         var textures : [SKTexture] = []
         
-        for i in 1...3 {
+        for i in 1...6 {
             var name = "koffing-\(i)"
             println(name)
             var texture = SKTexture(imageNamed: name)

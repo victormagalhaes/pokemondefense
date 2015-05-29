@@ -419,6 +419,7 @@
 				571A4F521B0171CE00F14695 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		571A4F531B0171CE00F14695 /* Build configuration list for PBXNativeTarget "TowerDefensePokemonTests" */ = {
 			isa = XCConfigurationList;
@@ -427,6 +428,7 @@
 				571A4F551B0171CE00F14695 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

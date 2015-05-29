@@ -10,8 +10,8 @@ import SpriteKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var charmander: SKSpriteNode!
-    var area : SKShapeNode!
-    var charmanderIsMoving: Bool = false
+    var koffing: SKSpriteNode!
+    var area: SKShapeNode!
     
     struct PhysicsCategory {
         static let None: UInt32 = 0
@@ -20,8 +20,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func didMoveToView(view: SKView) {
-        setupPhysicsWorld()
-        createBackground()
+        createPhysicsWorld()
+        createEnvironment()
         createCharmander(CGPointMake(self.frame.midX, self.frame.midY))
     }
     
@@ -34,16 +34,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
    
     override func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
     }
     
-    func setupPhysicsWorld() {
+    func createPhysicsWorld() {
         physicsWorld.gravity = CGVectorMake(0, 0)
         physicsWorld.contactDelegate = self
     }
     
-    func createBackground() {
-        let background = SKSpriteNode(imageNamed: "Background")
+    func createEnvironment() {
+        let background = SKSpriteNode(imageNamed: "background-pallet")
         background.anchorPoint = CGPointMake(0.0, 1.0)
         background.size = self.frame.size
         background.position = CGPointMake(self.frame.minX, self.frame.maxY)
@@ -85,10 +84,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createCharmander(positionToCreate: CGPoint) {
-        var texture = SKTexture(imageNamed: "charmander-001")
+        var texture = SKTexture(imageNamed: "charmander-1")
         charmander = SKSpriteNode(texture: texture)
+        charmander.xScale = 0.75
+        charmander.yScale = 0.75
         charmander.position = positionToCreate
-        charmander.anchorPoint = CGPointMake(0.55, 0.25)
+        charmander.anchorPoint = CGPointMake(0.55, 0.3)
         charmander.physicsBody = SKPhysicsBody(circleOfRadius: 20.0)
         charmander.physicsBody?.allowsRotation = false
         charmander.physicsBody?.dynamic = true
@@ -98,8 +99,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         charmander.physicsBody?.contactTestBitMask = PhysicsCategory.Background
         charmander.physicsBody?.collisionBitMask = PhysicsCategory.Background
         
-            
         self.addChild(charmander)
+        
+        let animationTexture = SKAction.animateWithTextures(createTexturesForCharmander(), timePerFrame: 0.3)
+        var charmanderAnimation = SKAction.repeatActionForever(animationTexture)
+        charmander.runAction(charmanderAnimation)
     }
     
     func convertToRadians(angle: CGFloat) -> CGFloat {
@@ -110,13 +114,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let dy = location.y - charmander.position.y
         let dx = location.x - charmander.position.x
         let hipo = sqrt(pow(dx, 2) + pow(2, dy))
-//            
+//
 //        let angle = atan2(dy, dx)
 //        let radAngle = convertToRadians(angle)
             
         var vector = CGVectorMake(dx, dy)
-            
-        charmander.physicsBody?.applyForce(vector)
-        charmanderIsMoving = true
+        charmander.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
+        charmander.physicsBody?.applyForce(vector, atPoint: CGPointMake(location.x, location.y))
+    }
+    
+    func createTexturesForCharmander() -> [SKTexture] {
+        var textures : [SKTexture] = []
+        
+        for i in 1...3 {
+            var name = "charmander-\(i)"
+            println(name)
+            var texture = SKTexture(imageNamed: name)
+            textures += [texture]
+        }
+        
+        return textures
+    }
+    
+    func createTexturesForKoffing() -> [SKTexture] {
+        var textures : [SKTexture] = []
+        
+        for i in 1...3 {
+            var name = "koffing-\(i)"
+            println(name)
+            var texture = SKTexture(imageNamed: name)
+            textures += [texture]
+        }
+        
+        return textures
     }
 }

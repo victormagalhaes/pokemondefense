@@ -12,6 +12,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var charmander: SKSpriteNode!
     var koffing: SKSpriteNode!
     var area: SKShapeNode!
+    var scoreNode = SKLabelNode()
+    var score: Int = 0
     
     struct PhysicsCategory {
         static let None: UInt32 = 0
@@ -23,8 +25,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMoveToView(view: SKView) {
         createPhysicsWorld()
         createEnvironment()
+        createPoints()
         createCharmander(CGPointMake(self.frame.midX, self.frame.midY))
-        createKoffing(CGPointMake(self.frame.minX + 200, self.frame.maxY - 100))
+        createKoffingInRandomPositionAndMakeItMoveByScenario()
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
@@ -36,6 +39,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
    
     override func update(currentTime: CFTimeInterval) {
+//        createKoffingInRandomPositionAndMakeItMoveByScenario()
     }
     
     func createPhysicsWorld() {
@@ -74,9 +78,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         area = SKShapeNode(path: navigationArea)
         area.physicsBody = SKPhysicsBody(edgeChainFromPath: navigationArea)
-        
+        //area.physicsBody = SKPhysicsBody(polygonFromPath: navigationArea)
         area.physicsBody?.dynamic = false
         area.physicsBody?.restitution = 0
+        area.physicsBody?.friction = 1
         area.physicsBody?.categoryBitMask = PhysicsCategory.Background
         area.physicsBody?.contactTestBitMask = PhysicsCategory.Background
         area.physicsBody?.collisionBitMask = PhysicsCategory.None
@@ -108,7 +113,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         charmander.runAction(charmanderAnimation)
     }
     
-    func createKoffing(positionToCreate: CGPoint) {
+    func createKoffing(positionToCreate: CGPoint) -> SKSpriteNode {
         var texture = SKTexture(imageNamed: "koffing-1")
         koffing = SKSpriteNode(texture: texture)
         koffing.xScale = 0.75
@@ -121,14 +126,53 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         koffing.physicsBody?.restitution = 0
         koffing.physicsBody?.linearDamping = 0
         koffing.physicsBody?.categoryBitMask = PhysicsCategory.Koffing
-        koffing.physicsBody?.contactTestBitMask = PhysicsCategory.Background | PhysicsCategory.Charmander
-        koffing.physicsBody?.collisionBitMask = PhysicsCategory.Background
+        koffing.physicsBody?.contactTestBitMask = PhysicsCategory.Charmander
+        koffing.physicsBody?.collisionBitMask = PhysicsCategory.None
         
         self.addChild(koffing)
         
         let animationTexture = SKAction.animateWithTextures(createTexturesForKoffing(), timePerFrame: 0.3)
         var koffingAnimation = SKAction.repeatActionForever(animationTexture)
         koffing.runAction(koffingAnimation)
+        
+        return koffing
+    }
+    
+    func createKoffingInRandomPositionAndMakeItMoveByScenario() {
+        var randomNumber = random()
+        var typeOfMovement: Int
+        var randomPosition: CGPoint
+        if 0.75...1 ~= randomNumber {
+            randomPosition = CGPointMake(self.frame.minX - 64, self.frame.maxY - 65)
+            typeOfMovement = 1
+        } else if 0.5...0.74 ~= randomNumber {
+            randomPosition = CGPointMake(self.frame.minX - 64, self.frame.maxY - 65)
+            typeOfMovement = 1
+        } else if 0.25...0.4 ~= randomNumber {
+            randomPosition = CGPointMake(self.frame.minX - 64, self.frame.maxY - 65)
+            typeOfMovement = 1
+        } else {
+            randomPosition = CGPointMake(self.frame.minX - 64, self.frame.maxY - 65)
+            typeOfMovement = 1
+        }
+        let koffingToAnimate = createKoffing(randomPosition)
+        moveKoffing(koffingToAnimate, typeOfMovement: typeOfMovement, durationOfMovement: 5)
+    }
+    
+    func random() -> Float {
+        return Float(arc4random()) / Float(UINT32_MAX)
+    }
+    
+    func moveKoffing(koffingToAnimate: SKSpriteNode, typeOfMovement: Int, durationOfMovement: Double) {
+        switch typeOfMovement {
+            case 1:
+                let movementOfKoffing = SKAction.moveByX(self.frame.size.width + (koffing.size.width * 2), y: 0.0, duration: durationOfMovement)
+                var interval = CFTimeInterval(random() * 5)
+                let koffingWait = SKAction.waitForDuration(interval)
+                koffingToAnimate.runAction(SKAction.sequence([koffingWait, movementOfKoffing]))
+            default:
+                return
+        }
     }
     
     func convertToRadians(angle: CGFloat) -> CGFloat {
@@ -146,6 +190,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var vector = CGVectorMake(dx, dy)
         charmander.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
         charmander.physicsBody?.applyForce(vector, atPoint: CGPointMake(location.x, location.y))
+        //charmander.runAction(SKAction.moveTo(CGPointMake(location.x, location.y), duration: 3))
     }
     
     func createTexturesForCharmander() -> [SKTexture] {
@@ -172,5 +217,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         return textures
+    }
+    
+    func createPoints() {
+        var points = SKSpriteNode(texture: nil, size: CGSizeMake(self.size.width, self.size.height*0.05))
+        points.anchorPoint=CGPointMake(0, 0)
+        points.position = CGPointMake(0, self.size.height-points.size.height)
+        
+        self.addChild(points)
+        
+        self.scoreNode.position = CGPointMake(points.size.width * 0.9, 1)
+        self.scoreNode.text = "0"
+        self.scoreNode.fontSize = points.size.height
+        self.scoreNode.fontName = "Helvetica Bold"
+        points.addChild(self.scoreNode)
+    }
+    
+    
+    func charmanderAttackKoffing(koffingToRemove: SKSpriteNode) {
+        self.score += 100
+        self.scoreNode.text = String(score)
+        koffingToRemove.removeFromParent()
+    }
+    
+    func didBeginContact(contact: SKPhysicsContact) {
+        if (contact.bodyA.categoryBitMask == PhysicsCategory.Koffing && contact.bodyB.categoryBitMask == PhysicsCategory.Charmander) {
+        charmanderAttackKoffing(contact.bodyA.node as! SKSpriteNode)
+        contact.bodyB.node?.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
+        } else if (contact.bodyA.categoryBitMask == PhysicsCategory.Charmander && contact.bodyB.categoryBitMask == PhysicsCategory.Koffing) {
+        charmanderAttackKoffing(contact.bodyB.node as! SKSpriteNode)
+        contact.bodyA.node?.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
+        }
     }
 }

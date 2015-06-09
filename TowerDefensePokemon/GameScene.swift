@@ -27,7 +27,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createEnvironment()
         createPoints()
         createCharmander(CGPointMake(self.frame.midX, self.frame.midY))
-        createKoffingInRandomPositionAndMakeItMoveByScenario()
+        
+        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(1.0)])))
+//        createKoffingInRandomPositionAndMakeItMoveByScenario()
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {

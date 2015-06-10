@@ -14,7 +14,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var koffing: SKSpriteNode!
     var area: SKShapeNode!
     var scoreNode = SKLabelNode()
-    var score: Int = 100
+    var score: Int = 25
     var backgroundMusicPlayer: AVAudioPlayer!
     
     struct PhysicsCategory {
@@ -201,7 +201,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         koffingToAnimate.runAction(SKAction.sequence([koffingWait, movementOfKoffing]), completion: { () -> Void in
             if koffingToAnimate.physicsBody?.velocity == CGVectorMake(0.0, 0.0) {
-                self.score -= 55
+                self.score -= 60
                 self.scoreNode.text = String(self.score)
             }
             koffingToAnimate.removeFromParent()

@@ -15,7 +15,10 @@
 		571A4F3E1B0171CE00F14695 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 571A4F3D1B0171CE00F14695 /* Images.xcassets */; };
 		571A4F411B0171CE00F14695 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 571A4F3F1B0171CE00F14695 /* LaunchScreen.xib */; };
 		571A4F4D1B0171CE00F14695 /* TowerDefensePokemonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 571A4F4C1B0171CE00F14695 /* TowerDefensePokemonTests.swift */; };
-		5779029D1B28B80400146582 /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = 5779029C1B28B80400146582 /* Sounds */; };
+		57EFE0851B28BEB300BEC8F5 /* charmanderSayHello.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 57EFE0811B28BEB300BEC8F5 /* charmanderSayHello.mp3 */; };
+		57EFE0861B28BEB300BEC8F5 /* gameOver.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 57EFE0821B28BEB300BEC8F5 /* gameOver.mp3 */; };
+		57EFE0871B28BEB300BEC8F5 /* koffingIsAttacked.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 57EFE0831B28BEB300BEC8F5 /* koffingIsAttacked.mp3 */; };
+		57EFE0881B28BEB300BEC8F5 /* palletBackgroundMusic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 57EFE0841B28BEB300BEC8F5 /* palletBackgroundMusic.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,7 +44,10 @@
 		571A4F461B0171CE00F14695 /* TowerDefensePokemonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TowerDefensePokemonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		571A4F4B1B0171CE00F14695 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		571A4F4C1B0171CE00F14695 /* TowerDefensePokemonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TowerDefensePokemonTests.swift; sourceTree = "<group>"; };
-		5779029C1B28B80400146582 /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
+		57EFE0811B28BEB300BEC8F5 /* charmanderSayHello.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = charmanderSayHello.mp3; sourceTree = "<group>"; };
+		57EFE0821B28BEB300BEC8F5 /* gameOver.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = gameOver.mp3; sourceTree = "<group>"; };
+		57EFE0831B28BEB300BEC8F5 /* koffingIsAttacked.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = koffingIsAttacked.mp3; sourceTree = "<group>"; };
+		57EFE0841B28BEB300BEC8F5 /* palletBackgroundMusic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = palletBackgroundMusic.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,7 +89,10 @@
 		571A4F2F1B0171CE00F14695 /* TowerDefensePokemon */ = {
 			isa = PBXGroup;
 			children = (
-				5779029C1B28B80400146582 /* Sounds */,
+				57EFE0811B28BEB300BEC8F5 /* charmanderSayHello.mp3 */,
+				57EFE0821B28BEB300BEC8F5 /* gameOver.mp3 */,
+				57EFE0831B28BEB300BEC8F5 /* koffingIsAttacked.mp3 */,
+				57EFE0841B28BEB300BEC8F5 /* palletBackgroundMusic.mp3 */,
 				571A4F321B0171CE00F14695 /* AppDelegate.swift */,
 				571A4F341B0171CE00F14695 /* GameScene.sks */,
 				571A4F361B0171CE00F14695 /* GameScene.swift */,
@@ -201,9 +210,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5779029D1B28B80400146582 /* Sounds in Resources */,
 				571A4F411B0171CE00F14695 /* LaunchScreen.xib in Resources */,
 				571A4F3E1B0171CE00F14695 /* Images.xcassets in Resources */,
+				57EFE0881B28BEB300BEC8F5 /* palletBackgroundMusic.mp3 in Resources */,
+				57EFE0871B28BEB300BEC8F5 /* koffingIsAttacked.mp3 in Resources */,
+				57EFE0861B28BEB300BEC8F5 /* gameOver.mp3 in Resources */,
+				57EFE0851B28BEB300BEC8F5 /* charmanderSayHello.mp3 in Resources */,
 				571A4F351B0171CE00F14695 /* GameScene.sks in Resources */,
 				571A4F3C1B0171CE00F14695 /* Main.storyboard in Resources */,
 			);

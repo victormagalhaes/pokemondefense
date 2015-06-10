@@ -16,6 +16,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var scoreNode = SKLabelNode()
     var score: Int = 25
     var backgroundMusicPlayer: AVAudioPlayer!
+    var isGamePaused: Bool = false
     
     struct PhysicsCategory {
         static let None: UInt32 = 0
@@ -30,7 +31,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createPoints()
         createCharmander(CGPointMake(self.frame.midX, self.frame.midY))
         playBackgroundMusic("palletBackgroundMusic.mp3")
-        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(3.0)])))
+        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(3.0)])), withKey: "createKoffings")
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
@@ -42,6 +43,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
    
     override func update(currentTime: CFTimeInterval) {
+        if self.score <= 0 && !isGamePaused {
+            showGameOver()
+        }
     }
     
     func random() -> Float {
@@ -181,8 +185,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func moveKoffing(koffingToAnimate: SKSpriteNode, typeOfMovement: Int, durationOfMovement: Double) {
-        var movementOfKoffing: SKAction!
-        switch typeOfMovement {
+        if !isGamePaused {
+            var movementOfKoffing: SKAction!
+            switch typeOfMovement {
             case 1, 3, 5:
                 movementOfKoffing = SKAction.moveToX(self.frame.size.width + (koffing.size.width * 2), duration: durationOfMovement)
             case 2, 4, 6:
@@ -191,22 +196,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 movementOfKoffing = SKAction.moveToY(0.0 - (koffing.size.height * 2), duration: durationOfMovement)
             case 8:
                 movementOfKoffing = SKAction.moveToY(self.frame.size.height + (koffing.size.height * 2), duration: durationOfMovement)
-
+                
             default:
                 return
-        }
-        
-        var interval = CFTimeInterval(random() * 5)
-        let koffingWait = SKAction.waitForDuration(interval)
-        
-        koffingToAnimate.runAction(SKAction.sequence([koffingWait, movementOfKoffing]), completion: { () -> Void in
-            if koffingToAnimate.physicsBody?.velocity == CGVectorMake(0.0, 0.0) {
-                self.score -= 60
-                self.scoreNode.text = String(self.score)
             }
-            koffingToAnimate.removeFromParent()
-        })
-
+            
+            var interval = CFTimeInterval(random() * 5)
+            let koffingWait = SKAction.waitForDuration(interval)
+            
+            koffingToAnimate.runAction(SKAction.sequence([koffingWait, movementOfKoffing]), completion: { () -> Void in
+                if koffingToAnimate.physicsBody?.velocity == CGVectorMake(0.0, 0.0) {
+                    if self.score <= 60 {
+                        self.score -= self.score
+                    } else {
+                        self.score -= 60
+                    }
+                    self.scoreNode.text = String(self.score)
+                }
+                koffingToAnimate.removeFromParent()
+            })
+        }
     }
     
     func moveCharmander(location: CGPoint) {
@@ -266,12 +275,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func didBeginContact(contact: SKPhysicsContact) {
-        if (contact.bodyA.categoryBitMask == PhysicsCategory.Koffing && contact.bodyB.categoryBitMask == PhysicsCategory.Charmander) {
-        charmanderAttackKoffing(contact.bodyA.node as! SKSpriteNode)
-        contact.bodyB.node?.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
-        } else if (contact.bodyA.categoryBitMask == PhysicsCategory.Charmander && contact.bodyB.categoryBitMask == PhysicsCategory.Koffing) {
-        charmanderAttackKoffing(contact.bodyB.node as! SKSpriteNode)
-        contact.bodyA.node?.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
+        if !isGamePaused {
+            if (contact.bodyA.categoryBitMask == PhysicsCategory.Koffing && contact.bodyB.categoryBitMask == PhysicsCategory.Charmander) {
+                charmanderAttackKoffing(contact.bodyA.node as! SKSpriteNode)
+                contact.bodyB.node?.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
+            } else if (contact.bodyA.categoryBitMask == PhysicsCategory.Charmander && contact.bodyB.categoryBitMask == PhysicsCategory.Koffing) {
+                charmanderAttackKoffing(contact.bodyB.node as! SKSpriteNode)
+                contact.bodyA.node?.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
+            }
         }
     }
     
@@ -295,5 +306,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         backgroundMusicPlayer.prepareToPlay()
         backgroundMusicPlayer.play()
         backgroundMusicPlayer.volume = 0.5
+    }
+    
+    func restartGame() {
+        playBackgroundMusic("palletBackgroundMusic.mp3")
+        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(3.0)])), withKey: "createKoffings")
+    }
+    
+    func showGameOver() {
+        self.isGamePaused = true
+        self.removeActionForKey("createKoffings")
+        koffing.removeAllChildren()
+        self.backgroundMusicPlayer.stop()
+        self.runAction(SKAction.playSoundFileNamed("gameOver.mp3", waitForCompletion: false))
+        
+        var alert = UIAlertController(title: "Game Over", message: "", preferredStyle: UIAlertControllerStyle.Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { _ in
+            self.restartGame()
+            self.score = 25
+            self.scoreNode.text = String(self.score)
+            self.isGamePaused = false
+        })
+        
+        self.view?.window?.rootViewController?.presentViewController(alert, animated: true, completion: nil)
     }
 }

@@ -101,7 +101,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createCharmander(positionToCreate: CGPoint) {
-        var texture = SKTexture(imageNamed: "charmander-1")
+        let texture = SKTexture(imageNamed: "charmander-1")
         charmander = SKSpriteNode(texture: texture)
         charmander.xScale = 0.75
         charmander.yScale = 0.75
@@ -119,13 +119,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(charmander)
         
         let animationTexture = SKAction.animateWithTextures(createTexturesForCharmander(), timePerFrame: 0.3)
-        var charmanderAnimation = SKAction.repeatActionForever(animationTexture)
+        let charmanderAnimation = SKAction.repeatActionForever(animationTexture)
         charmander.runAction(charmanderAnimation)
         charmander.runAction(SKAction.playSoundFileNamed("charmanderSayHello.mp3", waitForCompletion: false))
     }
     
     func createKoffing(positionToCreate: CGPoint) -> SKSpriteNode {
-        var texture = SKTexture(imageNamed: "koffing-1")
+        let texture = SKTexture(imageNamed: "koffing-1")
         koffing = SKSpriteNode(texture: texture)
         koffing.xScale = 0.75
         koffing.yScale = 0.75
@@ -143,17 +143,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(koffing)
         
         let animationTexture = SKAction.animateWithTextures(createTexturesForKoffing(), timePerFrame: 0.3)
-        var koffingAnimation = SKAction.repeatActionForever(animationTexture)
+        let koffingAnimation = SKAction.repeatActionForever(animationTexture)
         koffing.runAction(koffingAnimation)
         
         return koffing
     }
     
     func createKoffingInRandomPositionAndMakeItMoveByScenario() {
-        var randomNumber = random()
+        let randomNumber = random()
         var typeOfMovement: Int
         var randomPosition: CGPoint
-        var koffingWidth = 64
         
         if 0...0.125 ~= randomNumber {
             randomPosition = CGPointMake(self.frame.minX - 64, self.frame.maxY - 65)
@@ -201,7 +200,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 return
             }
             
-            var interval = CFTimeInterval(random() * 5)
+            let interval = CFTimeInterval(random() * 5)
             let koffingWait = SKAction.waitForDuration(interval)
             
             koffingToAnimate.runAction(SKAction.sequence([koffingWait, movementOfKoffing]), completion: { () -> Void in
@@ -221,9 +220,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func moveCharmander(location: CGPoint) {
         let dy = location.y - charmander.position.y
         let dx = location.x - charmander.position.x
-        let hipo = sqrt(pow(dx, 2) + pow(2, dy))
             
-        var vector = CGVectorMake(dx, dy)
+        let vector = CGVectorMake(dx, dy)
         charmander.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
         charmander.physicsBody?.applyForce(vector, atPoint: CGPointMake(location.x, location.y))
     }
@@ -232,8 +230,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var textures : [SKTexture] = []
         
         for i in 1...3 {
-            var name = "charmander-\(i)"
-            var texture = SKTexture(imageNamed: name)
+            let name = "charmander-\(i)"
+            let texture = SKTexture(imageNamed: name)
             textures += [texture]
         }
         
@@ -244,8 +242,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var textures : [SKTexture] = []
         
         for i in 1...6 {
-            var name = "koffing-\(i)"
-            var texture = SKTexture(imageNamed: name)
+            let name = "koffing-\(i)"
+            let texture = SKTexture(imageNamed: name)
             textures += [texture]
         }
         
@@ -253,7 +251,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createPoints() {
-        var points = SKSpriteNode(texture: nil, size: CGSizeMake(self.size.width, self.size.height*0.05))
+        let points = SKSpriteNode(texture: nil, size: CGSizeMake(self.size.width, self.size.height*0.05))
         points.anchorPoint=CGPointMake(0, 0)
         points.position = CGPointMake(0, self.size.height-points.size.height)
         
@@ -290,7 +288,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let url = NSBundle.mainBundle().URLForResource(
             filename, withExtension: nil)
         if (url == nil) {
-            println("Could not find file: \(filename)")
+            print("Could not find file: \(filename)")
             return
         }
         
@@ -298,7 +296,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         backgroundMusicPlayer =
             AVAudioPlayer(contentsOfURL: url, error: &error)
         if backgroundMusicPlayer == nil {
-            println("Could not create audio player: \(error!)")
+            print("Could not create audio player: \(error!)")
             return
         }
         
@@ -320,7 +318,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.backgroundMusicPlayer.stop()
         self.runAction(SKAction.playSoundFileNamed("gameOver.mp3", waitForCompletion: false))
         
-        var alert = UIAlertController(title: "Game Over", message: "", preferredStyle: UIAlertControllerStyle.Alert)
+        let alert = UIAlertController(title: "Game Over", message: "", preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { _ in
             self.restartGame()
             self.score = 25

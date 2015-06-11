@@ -14,9 +14,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var koffing: SKSpriteNode!
     var area: SKShapeNode!
     var scoreNode = SKLabelNode()
-    var score: Int = 25
+    var levelNode = SKLabelNode()
+    var score: Int = 120
     var backgroundMusicPlayer: AVAudioPlayer!
     var isGamePaused: Bool = false
+    var timeToRespawnKoffing: Float = 5.0
+    var damageCausedByKoffing: Int = 60
+    var increaseScoreByCatchingKoffing: Int = 75
+    var level: Int = 1
     
     struct PhysicsCategory {
         static let None: UInt32 = 0
@@ -29,9 +34,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         createPhysicsWorld()
         createEnvironment()
         createPoints()
+        createLevel()
         createCharmander(CGPointMake(self.frame.midX, self.frame.midY))
         playBackgroundMusic("palletBackgroundMusic.mp3")
-        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(3.0)])), withKey: "createKoffings")
+        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(CFTimeInterval(random() * self.timeToRespawnKoffing))])), withKey: "createKoffings")
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
@@ -45,6 +51,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func update(currentTime: CFTimeInterval) {
         if self.score <= 0 && !isGamePaused {
             showGameOver()
+        }
+        
+        if self.score >= 500 && self.level == 1 {
+            level++
+            timeToRespawnKoffing -= 1.0
+            damageCausedByKoffing += 10
+            self.levelNode.text = "Level \(self.level)"
+        } else if self.score >= 1000 && self.level == 2 {
+            level++
+            timeToRespawnKoffing -= 1.0
+            damageCausedByKoffing += 7
+            self.levelNode.text = "Level \(self.level)"
+        } else if self.score >= 1500 && self.level == 2 {
+            level++
+            timeToRespawnKoffing -= 1.0
+            damageCausedByKoffing += 5
+            self.levelNode.text = "Level \(self.level)"
         }
     }
     
@@ -120,7 +143,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let animationTexture = SKAction.animateWithTextures(createTexturesForCharmander(), timePerFrame: 0.3)
         let charmanderAnimation = SKAction.repeatActionForever(animationTexture)
-        charmander.runAction(charmanderAnimation)
+        charmander.runAction(charmanderAnimation, withKey: "animateCharmander")
         charmander.runAction(SKAction.playSoundFileNamed("charmanderSayHello.mp3", waitForCompletion: false))
     }
     
@@ -180,7 +203,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             typeOfMovement = 8
         }
         let koffingToAnimate = createKoffing(randomPosition)
-        moveKoffing(koffingToAnimate, typeOfMovement: typeOfMovement, durationOfMovement: 5)
+        moveKoffing(koffingToAnimate, typeOfMovement: typeOfMovement, durationOfMovement: CFTimeInterval(self.timeToRespawnKoffing))
     }
     
     func moveKoffing(koffingToAnimate: SKSpriteNode, typeOfMovement: Int, durationOfMovement: Double) {
@@ -200,15 +223,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 return
             }
             
-            let interval = CFTimeInterval(random() * 5)
+            let interval = CFTimeInterval(random() * self.timeToRespawnKoffing)
             let koffingWait = SKAction.waitForDuration(interval)
             
             koffingToAnimate.runAction(SKAction.sequence([koffingWait, movementOfKoffing]), completion: { () -> Void in
                 if koffingToAnimate.physicsBody?.velocity == CGVectorMake(0.0, 0.0) {
-                    if self.score <= 60 {
+                    if self.score <= self.damageCausedByKoffing {
                         self.score -= self.score
                     } else {
-                        self.score -= 60
+                        self.score -= self.damageCausedByKoffing
                     }
                     self.scoreNode.text = String(self.score)
                 }
@@ -220,6 +243,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func moveCharmander(location: CGPoint) {
         let dy = location.y - charmander.position.y
         let dx = location.x - charmander.position.x
+        
+        if dy > 0 {
+            charmander.removeActionForKey("animateCharmander")
+            let animationTexture = SKAction.animateWithTextures(createTexturesForCharmanderTurnedUp(), timePerFrame: 0.3)
+            let charmanderAnimation = SKAction.repeatActionForever(animationTexture)
+            charmander.runAction(charmanderAnimation)
+        } else {
+            charmander.removeActionForKey("animateCharmander")
+            let animationTexture = SKAction.animateWithTextures(createTexturesForCharmander(), timePerFrame: 0.3)
+            let charmanderAnimation = SKAction.repeatActionForever(animationTexture)
+            charmander.runAction(charmanderAnimation)
+        }
             
         let vector = CGVectorMake(dx, dy)
         charmander.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
@@ -230,6 +265,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var textures : [SKTexture] = []
         
         for i in 1...3 {
+            let name = "charmander-\(i)"
+            let texture = SKTexture(imageNamed: name)
+            textures += [texture]
+        }
+        
+        return textures
+    }
+    
+    func createTexturesForCharmanderTurnedUp() -> [SKTexture] {
+        var textures : [SKTexture] = []
+        
+        for i in 4...6 {
             let name = "charmander-\(i)"
             let texture = SKTexture(imageNamed: name)
             textures += [texture]
@@ -264,8 +311,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         points.addChild(self.scoreNode)
     }
     
+    func createLevel() {
+        let levels = SKSpriteNode(texture: nil, size: CGSizeMake(60.0, self.size.height*0.05))
+        levels.anchorPoint = CGPointMake(1.0, 0.0)
+        levels.position = CGPointMake(self.frame.minX, self.frame.minY)
+        
+        self.addChild(levels)
+        
+        self.levelNode.position = CGPointMake(levels.size.width * 0.9, 1)
+        self.levelNode.text = "Level \(self.level)"
+        self.levelNode.fontSize = levels.size.height
+        self.levelNode.fontName = "Helvetica Bold"
+        levels.addChild(self.levelNode)
+    }
+    
     func charmanderAttackKoffing(koffingToRemove: SKSpriteNode) {
-        self.score += 75
+        self.score += self.increaseScoreByCatchingKoffing
         self.scoreNode.text = String(score)
         koffingToRemove.runAction(SKAction.playSoundFileNamed("koffingIsAttacked.mp3", waitForCompletion: false), completion: {
             koffingToRemove.removeFromParent()
@@ -307,14 +368,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func restartGame() {
-        playBackgroundMusic("palletBackgroundMusic.mp3")
-        self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(3.0)])), withKey: "createKoffings")
+        let scene = GameScene(size: view!.bounds.size)
+        let skView = self.view!
+        skView.presentScene(scene)
     }
     
     func showGameOver() {
         self.isGamePaused = true
         self.removeActionForKey("createKoffings")
-        koffing.removeAllChildren()
+        koffing.removeFromParent()
+        koffing.runAction(SKAction.fadeOutWithDuration(0.0))
         self.backgroundMusicPlayer.stop()
         self.runAction(SKAction.playSoundFileNamed("gameOver.mp3", waitForCompletion: false))
         

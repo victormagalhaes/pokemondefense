@@ -367,28 +367,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         backgroundMusicPlayer.volume = 0.5
     }
     
-    func restartGame() {
-        let scene = GameScene(size: view!.bounds.size)
+    func showGameOver() {
+        let scene = RetryScene(size: view!.bounds.size)
         let skView = self.view!
         skView.presentScene(scene)
-    }
-    
-    func showGameOver() {
-        self.isGamePaused = true
-        self.removeActionForKey("createKoffings")
-        koffing.removeFromParent()
-        koffing.runAction(SKAction.fadeOutWithDuration(0.0))
-        self.backgroundMusicPlayer.stop()
-        self.runAction(SKAction.playSoundFileNamed("gameOver.mp3", waitForCompletion: false))
-        
-        let alert = UIAlertController(title: "Game Over", message: "", preferredStyle: UIAlertControllerStyle.Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) { _ in
-            self.restartGame()
-            self.score = 25
-            self.scoreNode.text = String(self.score)
-            self.isGamePaused = false
-        })
-        
-        self.view?.window?.rootViewController?.presentViewController(alert, animated: true, completion: nil)
     }
 }

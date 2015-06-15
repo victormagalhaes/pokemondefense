@@ -116,7 +116,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         area.physicsBody?.restitution = 0
         area.physicsBody?.friction = 1
         area.physicsBody?.categoryBitMask = PhysicsCategory.Background
-        area.physicsBody?.contactTestBitMask = PhysicsCategory.Background
+        area.physicsBody?.contactTestBitMask = PhysicsCategory.None
         area.physicsBody?.collisionBitMask = PhysicsCategory.None
         
         self.addChild(area)
@@ -134,9 +134,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         charmander.physicsBody?.allowsRotation = false
         charmander.physicsBody?.dynamic = true
         charmander.physicsBody?.restitution = 0
-        charmander.physicsBody?.angularDamping = 1
+        charmander.physicsBody?.angularDamping = 0
         charmander.physicsBody?.categoryBitMask = PhysicsCategory.Charmander
-        charmander.physicsBody?.contactTestBitMask = PhysicsCategory.Background | PhysicsCategory.Koffing
+        charmander.physicsBody?.contactTestBitMask = PhysicsCategory.Koffing
         charmander.physicsBody?.collisionBitMask = PhysicsCategory.Background
         
         self.addChild(charmander)
@@ -258,7 +258,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
         let vector = CGVectorMake(dx, dy)
         charmander.physicsBody?.velocity = CGVectorMake(0.0, 0.0)
-        charmander.physicsBody?.applyForce(vector, atPoint: CGPointMake(location.x, location.y))
+        charmander.physicsBody?.applyForce(vector)
     }
     
     func createTexturesForCharmander() -> [SKTexture] {
@@ -370,8 +370,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func showGameOver() {
         self.backgroundMusicPlayer.stop()
         let scene = RetryScene(size: view!.bounds.size)
-        let skView = self.view!
-        skView.presentScene(scene)
+        self.view!.presentScene(scene)
         
     }
 }

@@ -13,7 +13,6 @@ class RetryScene: SKScene {
     var contentCreated = false
     
     override func didMoveToView(view: SKView) {
-        
         if (!self.contentCreated) {
             self.createContent()
             self.contentCreated = true
@@ -40,13 +39,12 @@ class RetryScene: SKScene {
         
         // black space color
         self.backgroundColor = SKColor.blackColor()
-        
     }
     
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)  {
         let gameScene = GameScene(size: self.size)
         
-        self.view?.presentScene(gameScene, transition: SKTransition.fadeWithDuration(1.0))
+        self.view!.presentScene(gameScene, transition: SKTransition.fadeWithDuration(1.0))
         
     }
 }

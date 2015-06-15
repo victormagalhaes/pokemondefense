@@ -17,6 +17,7 @@ class RetryScene: SKScene {
         if (!self.contentCreated) {
             self.createContent()
             self.contentCreated = true
+            self.runAction(SKAction.playSoundFileNamed("gameOver.mp3", waitForCompletion: false))
         }
     }
     

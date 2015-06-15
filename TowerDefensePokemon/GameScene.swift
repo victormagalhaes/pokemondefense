@@ -368,8 +368,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func showGameOver() {
+        self.backgroundMusicPlayer.stop()
         let scene = RetryScene(size: view!.bounds.size)
         let skView = self.view!
         skView.presentScene(scene)
+        
     }
 }

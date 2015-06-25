@@ -40,8 +40,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.runAction(SKAction.repeatActionForever(SKAction.sequence([SKAction.runBlock(createKoffingInRandomPositionAndMakeItMoveByScenario), SKAction.waitForDuration(CFTimeInterval(random() * self.timeToRespawnKoffing))])), withKey: "createKoffings")
     }
     
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
-        if let touch =  touches.first as? UITouch {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if let touch =  touches.first as UITouch! {
             let location = touch.locationInNode(self)
             
             moveCharmander(location)
@@ -349,15 +349,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let url = NSBundle.mainBundle().URLForResource(
             filename, withExtension: nil)
         if (url == nil) {
-            print("Could not find file: \(filename)")
+            print("Could not find file: \(filename)", appendNewline: false)
             return
         }
         
         var error: NSError? = nil
-        backgroundMusicPlayer =
-            AVAudioPlayer(contentsOfURL: url, error: &error)
+        do {
+            backgroundMusicPlayer =
+                try AVAudioPlayer(contentsOfURL: url!)
+        } catch let error1 as NSError {
+            error = error1
+            backgroundMusicPlayer = nil
+        }
         if backgroundMusicPlayer == nil {
-            print("Could not create audio player: \(error!)")
+            print("Could not create audio player: \(error!)", appendNewline: false)
             return
         }
         

@@ -41,7 +41,7 @@ class RetryScene: SKScene {
         self.backgroundColor = SKColor.blackColor()
     }
     
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)  {
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?)  {
         let gameScene = GameScene(size: self.size)
         
         self.view!.presentScene(gameScene, transition: SKTransition.fadeWithDuration(1.0))
